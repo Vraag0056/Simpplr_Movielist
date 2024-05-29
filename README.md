@@ -94,7 +94,7 @@ We can search any movie by its name.
 ------->>>>> BONUS Question Page - (Get Movies Count)
 - By this page we can get the number of movies in the specified language.
 - The following screenshot shows how this page works. Firstly we have the dropdown by which we can select any language.
-- 
+  
 ![10](https://github.com/Vraag0056/Simpplr_Movielist/assets/60671266/ab5e85d1-50c8-4a4d-a4f2-6bca6a168e9e)
 
 - After selecting and clicking submit button we can show the result which is shown in the following image.
