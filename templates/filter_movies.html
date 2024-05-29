@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <style>
+        body {
+    background-image: url('/static/images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+.form-box {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+
+      }
+    .mt-4, .my-4 {
+    margin-top: 2rem !important;
+}
+
+      @media (min-width: 1200px) {
+    .container {
+        max-width: 850px;
+    }
+    </style>
+  </head>
+  <body>
+   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="../"><strong>Simpplr Movie List</strong></a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item mr-4">
+            <a class="nav-link" href="../">All Movies</a>
+          </li>
+          <li class="nav-item mr-4">
+            <a class="nav-link" href="add_movies">Add Movies</a>
+          </li>
+          <li class="nav-item active mr-4">
+            <a class="nav-link" href="filter_movies">Filter Movies</a>
+          </li>
+          <li class="nav-item mr-4">
+            <a class="nav-link" href="get_movie_counts">Get Movies Count(Bonus)</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+<div class="container mt-4">
+   <div class="form-box">
+       <h2 class="text-center mb-3">Filter Movies</h2>
+      <div class="row mb-3">
+        <div class="col-md-6 ml-auto">
+
+            <select id="filter_sort" name="filter_sort" class="form-control">
+                <option value="">Select Filter</option>
+                <option value="Movie Name">Movie Name</option>
+                <option value="Director Name">Director Name</option>
+                <option value="Year">Year</option>
+                <option value="Language">Language</option>
+                <option value="Rating">Rating</option>
+            </select>
+          <input type="text" class="form-control" id="search-bar" placeholder="Search according to filter">
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+<!--              <th>#</th>-->
+              <th>Movie Name</th>
+              <th>Director Name</th>
+              <th>Year</th>
+              <th>Language</th>
+              <th>Rating</th>
+
+            </tr>
+          </thead>
+          <tbody id="movie-table">
+          </tbody>
+        </table>
+      </div>
+      <nav>
+        <ul class="pagination justify-content-center" id="pagination">
+        </ul>
+      </nav>
+   </div>
+    </div>
+
+
+  <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    let movies = [];
+    const rowsPerPage = 5;
+    let currentPage = 1;
+
+    function fetchMovies() {
+        fetch('movies')
+            .then(response => response.json())
+            .then(data => {
+                movies = data;
+                console.log(movies);
+                updateTable();
+            })
+            .catch(error => {
+                console.error('Error fetching Excel data:', error);
+            });
+    }
+
+    function renderTable(data) {
+        const tableBody = document.getElementById('movie-table');
+        tableBody.innerHTML = '';
+        data.forEach((movie, index) => {
+            const row = `
+                <tr>
+<!--                    <td>${index + 1}</td>-->
+                    <td>${movie['Movie Name']}</td>
+                    <td>${movie['Director Name']}</td>
+                    <td>${movie['Year']}</td>
+                    <td>${movie['Language']}</td>
+                    <td>${movie['Rating']} / 5</td>
+
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const movieName = this.dataset.movieName;
+                deleteMovie(movieName);
+            });
+        });
+    }
+
+    function deleteMovie(movieName) {
+        fetch('delete_movie', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ 'movie_name': movieName })
+        })
+        .then(response => {
+            if (response.ok) {
+                fetchMovies();
+            } else {
+                console.error('Failed to delete movie');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function renderPagination(totalPages) {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+            const pageItem = `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#">${i}</a>
+                </li>
+            `;
+            pagination.insertAdjacentHTML('beforeend', pageItem);
+        }
+
+        const pageLinks = pagination.querySelectorAll('.page-link');
+        pageLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentPage = parseInt(e.target.textContent);
+                updateTable();
+            });
+        });
+    }
+
+    function updateTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedData = movies.slice(start, end);
+        renderTable(paginatedData);
+        renderPagination(Math.ceil(movies.length / rowsPerPage));
+    }
+ var filter_sort = document.getElementById("filter_sort");
+
+
+  filter_sort.addEventListener("change", function() {
+
+    var selectedOption = filter_sort.options[filter_sort.selectedIndex].value;
+    console.log("Selected option: " + selectedOption);
+
+  });
+    document.getElementById('search-bar').addEventListener('input', function (e) {
+        const query = e.target.value.toLowerCase();
+        let filteredData ="";
+        console.log("fcrfv");
+        console.log(filter_sort.options[filter_sort.selectedIndex].value);
+        if(filter_sort.options[filter_sort.selectedIndex].value=="Director Name"){
+        filteredData = movies.filter(movie => movie['Director Name'].toLowerCase().includes(query));
+        }
+else if(filter_sort.options[filter_sort.selectedIndex].value=="Year"){
+         filteredData = movies.filter(movie => movie['Year'].toString().includes(query));
+        }
+        else if(filter_sort.options[filter_sort.selectedIndex].value=="Language"){
+         filteredData = movies.filter(movie => movie['Language'].toLowerCase().includes(query));
+        }
+        else if(filter_sort.options[filter_sort.selectedIndex].value=="Rating"){
+         filteredData = movies.filter(movie => movie['Rating'].toString().includes(query));
+        }
+        else if(filter_sort.options[filter_sort.selectedIndex].value=="Movie Name"){
+         filteredData = movies.filter(movie => movie['Movie Name'].toLowerCase().includes(query));
+        }
+        if(filter_sort.options[filter_sort.selectedIndex].value!="")
+        {renderTable(filteredData);
+        renderPagination(Math.ceil(filteredData.length / rowsPerPage));}
+    });
+
+    fetchMovies();
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

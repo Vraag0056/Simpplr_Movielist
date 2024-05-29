@@ -1,0 +1,437 @@
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+      body {
+    background-image: url('/static/images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+      .form-box {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+      }
+      .mt-4, .my-4 {
+        margin-top: 2rem !important;
+      }
+      @media (min-width: 1200px) {
+        .container {
+          max-width: 950px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href=""><strong>Simpplr Movie List</strong></a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item mr-4 active">
+            <a class="nav-link" href="">All Movies</a>
+          </li>
+          <li class="nav-item mr-4">
+            <a class="nav-link" href="add_movies">Add Movies</a>
+          </li>
+          <li class="nav-item mr-4">
+            <a class="nav-link" href="filter_movies">Filter Movies</a>
+          </li>
+          <li class="nav-item mr-4">
+            <a class="nav-link" href="get_movie_counts">Get Movies Count(Bonus)</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <div class="form-box">
+        <h2 class="text-center mb-4">All Movies</h2>
+        <div class="row mb-3">
+          <div class="col-md-6 ml-auto">
+            <input type="text" class="form-control" id="search-bar" placeholder="Search for a movie">
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Movie Name</th>
+                <th>Director Name</th>
+                <th>Year</th>
+                <th>Language</th>
+                <th>Rating</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="movie-table">
+            </tbody>
+          </table>
+        </div>
+        <nav>
+          <ul class="pagination justify-content-center" id="pagination">
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateModalLabel">Update Movie</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+
+            <form id="update-form" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+
+                <label for="update-movie-name">Movie Name</label>
+                <input type="text" class="form-control" id="update-movie-name" name="movie_name">
+              </div>
+              <div class="form-group">
+                <label for="update-director-name">Director Name</label>
+                <input type="text" class="form-control" id="update-director-name" name="director_name">
+              </div>
+              <div class="form-group">
+                <label for="update-year">Year</label>
+                <select id="update-year" name="year" class="form-control">
+              {% for item in years %}
+                <option value="{{ item }}">{{ item }}</option>
+              {% endfor %}
+            </select>
+              </div>
+              <div class="form-group">
+                <label for="update-language">Language</label>
+                <select id="update-language" name="language" class="form-control">
+              <option value="Afrikaans">Afrikaans</option>
+<option value="Albanian">Albanian</option>
+<option value="Amharic">Amharic</option>
+<option value="Arabic">Arabic</option>
+<option value="Armenian">Armenian</option>
+<option value="Azerbaijani">Azerbaijani</option>
+<option value="Basque">Basque</option>
+<option value="Belarusian">Belarusian</option>
+<option value="Bengali">Bengali</option>
+<option value="Bosnian">Bosnian</option>
+<option value="Bulgarian">Bulgarian</option>
+<option value="Catalan">Catalan</option>
+<option value="Cebuano">Cebuano</option>
+<option value="Chichewa">Chichewa</option>
+<option value="Chinese (Simplified)">Chinese (Simplified)</option>
+<option value="Chinese (Traditional)">Chinese (Traditional)</option>
+<option value="Corsican">Corsican</option>
+<option value="Croatian">Croatian</option>
+<option value="Czech">Czech</option>
+<option value="Danish">Danish</option>
+<option value="Dutch">Dutch</option>
+<option value="English">English</option>
+<option value="Esperanto">Esperanto</option>
+<option value="Estonian">Estonian</option>
+<option value="Filipino">Filipino</option>
+<option value="Finnish">Finnish</option>
+<option value="French">French</option>
+<option value="Frisian">Frisian</option>
+<option value="Galician">Galician</option>
+<option value="Georgian">Georgian</option>
+<option value="German">German</option>
+<option value="Greek">Greek</option>
+<option value="Gujarati">Gujarati</option>
+<option value="Haitian Creole">Haitian Creole</option>
+<option value="Hausa">Hausa</option>
+<option value="Hawaiian">Hawaiian</option>
+<option value="Hebrew">Hebrew</option>
+<option value="Hindi">Hindi</option>
+<option value="Hmong">Hmong</option>
+<option value="Hungarian">Hungarian</option>
+<option value="Icelandic">Icelandic</option>
+<option value="Igbo">Igbo</option>
+<option value="Indonesian">Indonesian</option>
+<option value="Irish">Irish</option>
+<option value="Italian">Italian</option>
+<option value="Japanese">Japanese</option>
+<option value="Javanese">Javanese</option>
+<option value="Kannada">Kannada</option>
+<option value="Kazakh">Kazakh</option>
+<option value="Khmer">Khmer</option>
+<option value="Kinyarwanda">Kinyarwanda</option>
+<option value="Korean">Korean</option>
+<option value="Kurdish (Kurmanji)">Kurdish (Kurmanji)</option>
+<option value="Kyrgyz">Kyrgyz</option>
+<option value="Lao">Lao</option>
+<option value="Latin">Latin</option>
+<option value="Latvian">Latvian</option>
+<option value="Lithuanian">Lithuanian</option>
+<option value="Luxembourgish">Luxembourgish</option>
+<option value="Macedonian">Macedonian</option>
+<option value="Malagasy">Malagasy</option>
+<option value="Malay">Malay</option>
+<option value="Malayalam">Malayalam</option>
+<option value="Maltese">Maltese</option>
+<option value="Maori">Maori</option>
+<option value="Marathi">Marathi</option>
+<option value="Mongolian">Mongolian</option>
+<option value="Myanmar (Burmese)">Myanmar (Burmese)</option>
+<option value="Nepali">Nepali</option>
+<option value="Norwegian">Norwegian</option>
+<option value="Odia (Oriya)">Odia (Oriya)</option>
+<option value="Pashto">Pashto</option>
+<option value="Persian">Persian</option>
+<option value="Polish">Polish</option>
+<option value="Portuguese">Portuguese</option>
+<option value="Punjabi">Punjabi</option>
+<option value="Romanian">Romanian</option>
+<option value="Russian">Russian</option>
+<option value="Samoan">Samoan</option>
+<option value="Scots Gaelic">Scots Gaelic</option>
+<option value="Serbian">Serbian</option>
+<option value="Sesotho">Sesotho</option>
+<option value="Shona">Shona</option>
+<option value="Sindhi">Sindhi</option>
+<option value="Sinhala">Sinhala</option>
+<option value="Slovak">Slovak</option>
+<option value="Slovenian">Slovenian</option>
+<option value="Somali">Somali</option>
+<option value="Spanish">Spanish</option>
+<option value="Sundanese">Sundanese</option>
+<option value="Swahili">Swahili</option>
+<option value="Swedish">Swedish</option>
+<option value="Tajik">Tajik</option>
+<option value="Tamil">Tamil</option>
+<option value="Tatar">Tatar</option>
+<option value="Telugu">Telugu</option>
+<option value="Thai">Thai</option>
+<option value="Turkish">Turkish</option>
+<option value="Turkmen">Turkmen</option>
+<option value="Ukrainian">Ukrainian</option>
+<option value="Urdu">Urdu</option>
+<option value="Uyghur">Uyghur</option>
+<option value="Uzbek">Uzbek</option>
+<option value="Vietnamese">Vietnamese</option>
+<option value="Welsh">Welsh</option>
+<option value="Xhosa">Xhosa</option>
+<option value="Yiddish">Yiddish</option>
+<option value="Yoruba">Yoruba</option>
+<option value="Zulu">Zulu</option>
+
+            </select>
+              </div>
+              <div class="form-group">
+                <label for="update-rating">Rating (out of 5)</label>
+                <input type="text" class="form-control" id="update-rating" name="rating">
+              </div>
+              <input type="hidden" id="original-movie-name" name="original_movie_name">
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="save-changes">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+    let movies = [];
+    const rowsPerPage = 5;
+    let currentPage = 1;
+
+    function fetchMovies() {
+        fetch('movies')
+            .then(response => response.json())
+            .then(data => {
+                movies = data;
+                updateTable();
+            })
+            .catch(error => {
+                console.error('Error fetching movie data:', error);
+            });
+    }
+    function renderTable(data) {
+        const tableBody = document.getElementById('movie-table');
+        tableBody.innerHTML = '';
+
+        data.forEach((movie, index) => {
+            const row = `
+                <tr>
+
+                    <td>${movie['Movie Name']}</td>
+                    <td>${movie['Director Name']}</td>
+                    <td>${movie['Year']}</td>
+                    <td>${movie['Language']}</td>
+                    <td>${movie['Rating']} / 5</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm update-btn" data-movie-name="${movie['Movie Name']}" data-toggle="modal" data-target="#updateModal">Update</button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-movie-name="${movie['Movie Name']}">Delete</button>
+                    </td>
+                </tr>
+            `;
+
+            tableBody.insertAdjacentHTML('beforeend', row);
+
+        }
+
+        );
+
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const movieName = this.dataset.movieName;
+                deleteMovie(movieName);
+
+            });
+        });
+
+        document.querySelectorAll('.update-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const movieName = this.dataset.movieName;
+                populateUpdateForm(movieName);
+            });
+        });
+    }
+
+    function populateUpdateForm(movieName) {
+        const movie = movies.find(m => m['Movie Name'] === movieName);
+        document.getElementById('update-movie-name').value = movie['Movie Name'];
+        document.getElementById('update-director-name').value = movie['Director Name'];
+        document.getElementById('update-year').value = movie['Year'];
+        document.getElementById('update-language').value = movie['Language'];
+        document.getElementById('update-rating').value = movie['Rating'];
+        document.getElementById('original-movie-name').value = movie['Movie Name'];
+    }
+
+    document.getElementById('save-changes').addEventListener('click', function () {
+    const movieName = document.getElementById('update-movie-name').value;
+    const directorName = document.getElementById('update-director-name').value;
+    const year = document.getElementById('update-year').value;
+    const language = document.getElementById('update-language').value;
+    const rating = document.getElementById('update-rating').value;
+    const originalMovieName = document.getElementById('original-movie-name').value;
+
+    const data = {
+        movie_name: movieName,
+        director_name: directorName,
+        year: year,
+        language: language,
+        rating: rating,
+        original_movie_name: originalMovieName
+    };
+
+    fetch('update_movie', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (response.ok) {
+            fetchMovies();
+            $('#updateModal').modal('hide');
+        } else {
+            console.error('Failed to update movie');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating movie:', error);
+    });
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    function deleteMovie(movieName) {
+        fetch(`delete_movie?movie_name=${encodeURIComponent(movieName)}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    fetchMovies();
+                } else {
+                    console.error('Failed to delete movie');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting movie:', error);
+            });
+            alert('Data deleted successfully!');
+    }
+
+    function updateTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedMovies = movies.slice(start, end);
+        renderTable(paginatedMovies);
+        renderPagination();
+    }
+
+    function renderPagination() {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+
+        const totalPages = Math.ceil(movies.length / rowsPerPage);
+        for (let i = 1; i <= totalPages; i++) {
+            const pageItem = document.createElement('li');
+            pageItem.className = 'page-item';
+            if (i === currentPage) {
+                pageItem.classList.add('active');
+            }
+            const pageLink = document.createElement('a');
+            pageLink.className = 'page-link';
+            pageLink.href = '#';
+            pageLink.textContent = i;
+            pageLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                currentPage = i;
+                updateTable();
+            });
+            pageItem.appendChild(pageLink);
+            pagination.appendChild(pageItem);
+        }
+    }
+
+
+
+    document.getElementById('search-bar').addEventListener('input', function () {
+        const searchText = this.value.toLowerCase();
+        const filteredMovies = movies.filter(movie => movie['Movie Name'].toLowerCase().includes(searchText));
+        renderTable(filteredMovies);
+    });
+
+    fetchMovies();
+});
+
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39jU2I6puf0YWI8IebhndL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
